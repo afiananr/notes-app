@@ -19,3 +19,11 @@ MyNoteApps adalah aplikasi catatan pribadi yang dirancang untuk membantu Anda me
 * **LiveData & ViewModel**: Untuk manajemen siklus hidup dan observasi data.
 
 ## 📸 Tampilan Aplikasi
+<p align="center">
+  <img src="screenshots/Screenshot 2025-07-13 160522.png" alt="Login" width="230"/>
+  <img src="screenshots/Screenshot 2025-07-13 160609.png" alt="Register" width="230"/>
+  <img src="screenshots/Screenshot 2025-07-13 160634.png" alt="Home" width="230"/>
+  <img src="screenshots/Screenshot 2025-07-13 160652.png" alt="Login" width="230"/>
+  <img src="screenshots/Screenshot 2025-07-13 160709.png" alt="Register" width="230"/>
+  <img src="screenshots/Screenshot 2025-07-13 160810.png" alt="Home" width="230"/>
+</p>
