@@ -1,7 +1,11 @@
 package com.example.modul7_new.ui.insert
 
+import android.content.DialogInterface
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.pemmob_modul7.R
@@ -9,6 +13,7 @@ import com.example.modul7_new.database.Note
 import com.example.modul7_new.helper.DateHelper
 import com.example.modul7_new.helper.ViewModelFactory
 import com.example.pemmob_modul7.databinding.ActivityNoteAddUpdateBinding
+import com.google.android.material.appbar.MaterialToolbar // Import MaterialToolbar
 
 class NoteAddUpdateActivity : AppCompatActivity() {
     companion object {
@@ -28,6 +33,10 @@ class NoteAddUpdateActivity : AppCompatActivity() {
 
         _activityNoteAddUpdateBinding = ActivityNoteAddUpdateBinding.inflate(layoutInflater)
         setContentView(binding?.root)
+
+        // Temukan Toolbar dan set sebagai supportActionBar
+        val toolbar: MaterialToolbar = binding?.root?.findViewById(R.id.toolbar)!!
+        setSupportActionBar(toolbar)
 
         noteAddUpdateViewModel = obtainViewModel(this@NoteAddUpdateActivity)
 
@@ -52,8 +61,12 @@ class NoteAddUpdateActivity : AppCompatActivity() {
             actionBarTitle = getString(R.string.add)
             btnTitle = getString(R.string.save)
         }
+        // Atur judul toolbar
         supportActionBar?.title = actionBarTitle
+        // Ini memastikan panah kembali muncul di Toolbar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
         binding?.btnSubmit?.text = btnTitle
         binding?.btnSubmit?.setOnClickListener {
             val title = binding?.edtTitle?.text.toString().trim()
@@ -84,8 +97,62 @@ class NoteAddUpdateActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
+
+    // ... (sisa metode onCreateOptionsMenu, onOptionsItemSelected, onBackPressed, showAlertDialog, dll. tetap sama)
+    // Pastikan app:showAsAction="never" di menu_form.xml
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if (isEdit) {
+            menuInflater.inflate(R.menu.menu_form, menu)
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_delete -> showAlertDialog(ALERT_DIALOG_DELETE)
+            android.R.id.home -> showAlertDialog(ALERT_DIALOG_CLOSE)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    @Suppress("MissingSuperCall") // Menekan peringatan lint untuk onBackPressed
+    override fun onBackPressed() {
+        showAlertDialog(ALERT_DIALOG_CLOSE)
+    }
+
+    private fun showAlertDialog(type: Int) {
+        val dialogTitle: String
+        val dialogMessage: String
+        val isDialogClose = type == ALERT_DIALOG_CLOSE
+        if (isDialogClose) {
+            dialogTitle = getString(R.string.cancel)
+            dialogMessage = getString(R.string.message_cancel)
+        } else {
+            dialogMessage = getString(R.string.message_delete)
+            dialogTitle = getString(R.string.delete)
+        }
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        alertDialogBuilder.setTitle(dialogTitle)
+        alertDialogBuilder
+            .setMessage(dialogMessage)
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
+                if (isDialogClose) {
+                    finish()
+                } else {
+                    noteAddUpdateViewModel.delete(note as Note)
+                    showToast(getString(R.string.deleted))
+                    finish()
+                }
+            }
+            .setNegativeButton(getString(R.string.no)) { dialog, _ ->
+                dialog.cancel()
+            }
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+    }
+
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
@@ -94,6 +161,7 @@ class NoteAddUpdateActivity : AppCompatActivity() {
         super.onDestroy()
         _activityNoteAddUpdateBinding = null
     }
+
     private fun obtainViewModel(activity: AppCompatActivity): NoteAddUpdateViewModel {
         val factory = ViewModelFactory.getInstance(activity.application)
         return ViewModelProvider(activity, factory).get(NoteAddUpdateViewModel::class.java)
